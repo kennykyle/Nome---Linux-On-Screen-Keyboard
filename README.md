@@ -1,6 +1,6 @@
 # Nome - Onscreen Keyboard
 
-Nome is a mouse-driven on-screen keyboard for GNOME Shell 50 on Wayland. It runs inside GNOME Shell instead of as a normal app, which lets it stay above other windows, avoid stealing focus from the text field you are typing into, and send real keyboard events through Mutter's virtual input device. It is built for accessibility-first desktop use: mouse, touch, limited-movement workflows, terminals, login prompts, and any situation where GNOME's built-in keyboard is not enough.
+Nome is a mouse-driven virtual on-screen keyboard for GNOME Shell 50 on Wayland. It runs inside GNOME Shell instead of as a normal app, which lets it stay above other windows, avoid stealing focus from the text field you are typing into, and send real keyboard events through Mutter's virtual input device. It is built for accessibility-first desktop use: mouse, touch, limited-movement workflows, terminals, login prompts, and any situation where GNOME's built-in keyboard is not enough.
 
 ## Why This Exists
 
