@@ -16,7 +16,11 @@ After the install, you can optionally add login-screen support for GDM.
 That part needs administrator authentication and is safe to skip.
 
 If you are updating and previously installed GDM/login-screen support,
-choose that option again so the login-screen copy is updated too.
+the installer will detect it and update the login-screen copy too.
+
+The installer downloads the full English prediction vocabulary when
+network access is available. If that fails, install still continues and
+you can retry from the extension menu later.
 
 INTRO
 

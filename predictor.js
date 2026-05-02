@@ -71,6 +71,7 @@ const WORD_RE = /^[a-z][a-z']*$/;
 export class WordPredictor {
     constructor() {
         this._baseFreq = new Map();      // word -> base frequency (rank-derived)
+        this._baseSourceEntries = 0;     // non-empty rows in loaded wordlist
         this._userBoost = new Map();     // word -> learned repeat count
         this._bigrams = new Map();       // prev -> Map<next, count>
         this._seedBigrams = new Map();   // prev -> Map<next, count>
@@ -80,6 +81,7 @@ export class WordPredictor {
                                           //   say about "next word" on first
                                           //   use before the user has taught
                                           //   it any personal bigrams.
+        this._seedFallbackWords = new Set(); // seed-derived prefix fallback
         this._prefixIndex = new Map();   // first char -> [words]
         this._userWordsInIndex = new Set(); // tracks user-added words
 
@@ -92,29 +94,21 @@ export class WordPredictor {
         this._dirty = false;
     }
 
-    // Accepts either a single path string or an array.  Multiple
-    // paths are tried in order; first readable, non-empty file wins
-    // (same pattern as setWordlistPath).  This lets a user-scope
-    // copy under $XDG_DATA_HOME take precedence over the install-time
-    // copy shipped next to the extension.
-    setSeedBigramsPath(p) {
-        this._seedBigramsPaths = Array.isArray(p)
-            ? p.filter(Boolean)
-            : (p ? [p] : []);
+    // Paths are tried in order; first readable, non-empty file wins.
+    // Accepts a single path too so callers can pass the simple case
+    // without wrapping it.
+    setSeedBigramsPaths(paths) {
+        this._seedBigramsPaths = Array.isArray(paths)
+            ? paths.filter(Boolean)
+            : (paths ? [paths] : []);
     }
-    setSeedBigramsPaths(arr) { this.setSeedBigramsPath(arr); }
     getLoadedSeedBigramsPath() { return this._loadedSeedBigramsPath; }
 
-    // Accept a single string (back-compat) OR an array of candidate
-    // paths tried in order.  First readable, non-empty file wins --
-    // lets us prefer a user-managed copy (say under XDG_DATA_HOME)
-    // over the install-time copy without changing the API.
-    setWordlistPath(p) {
-        this._wordlistPaths = Array.isArray(p)
-            ? p.filter(Boolean)
-            : (p ? [p] : []);
+    setWordlistPaths(paths) {
+        this._wordlistPaths = Array.isArray(paths)
+            ? paths.filter(Boolean)
+            : (paths ? [paths] : []);
     }
-    setWordlistPaths(arr) { this.setWordlistPath(arr); }
     setUserDataPath(p) { this._userDataPath = p; }
 
     // The path we most recently read the base dictionary from; null if
@@ -123,33 +117,37 @@ export class WordPredictor {
     getLoadedWordlistPath() { return this._loadedWordlistPath; }
 
 
-    // ---- load paths ---------------------------------------------------
-
-    loadBaseDictionary() {
-        this._baseFreq.clear();
-        // Drop the top-N cache so the post-word fallback list
-        // reflects the freshly-loaded dictionary on the next call.
-        this._topBaseCache = null;
-
-        let text = null;
-        let usedPath = null;
-        for (const p of this._wordlistPaths) {
+    _loadFirstTextFile(paths, label) {
+        for (const p of paths) {
             if (!p) continue;
             try {
                 const file = Gio.File.new_for_path(p);
                 if (!file.query_exists(null)) continue;
                 const [ok, bytes] = file.load_contents(null);
                 if (!ok) continue;
-                const decoded = new TextDecoder('utf-8').decode(bytes);
-                if (!decoded.trim()) continue;
-                text = decoded;
-                usedPath = p;
-                break;
+                const text = new TextDecoder('utf-8').decode(bytes);
+                if (!text.trim()) continue;
+                return [text, p];
             } catch (e) {
-                log(`gnome-osk: wordlist load failed at ${p}: ${e}`);
+                log(`gnome-osk: ${label} load failed at ${p}: ${e}`);
             }
         }
+        return [null, null];
+    }
 
+
+    // ---- load paths ---------------------------------------------------
+
+    loadBaseDictionary() {
+        this._baseFreq.clear();
+        this._baseSourceEntries = 0;
+        this._seedFallbackWords.clear();
+        // Drop the top-N cache so the post-word fallback list
+        // reflects the freshly-loaded dictionary on the next call.
+        this._topBaseCache = null;
+
+        const [text, usedPath] =
+            this._loadFirstTextFile(this._wordlistPaths, 'wordlist');
         this._loadedWordlistPath = usedPath;
 
         if (!text) {
@@ -163,6 +161,8 @@ export class WordPredictor {
         }
 
         const lines = text.split(/\r?\n/);
+        this._baseSourceEntries = lines.reduce(
+            (count, raw) => count + (raw.trim() ? 1 : 0), 0);
         // First pass: filter + keep rank.  We use the original line
         // number as the rank so the very first (commonest) word gets
         // the highest base frequency; linear decay is plenty for
@@ -223,34 +223,27 @@ export class WordPredictor {
         // count of 10^9 would score 3 * 10^10 and swamp user data.
         this._seedBigrams.clear();
         this._loadedSeedBigramsPath = null;
+        let removedFallbackWords = false;
+        for (const word of this._seedFallbackWords)
+            removedFallbackWords = this._baseFreq.delete(word) || removedFallbackWords;
+        this._seedFallbackWords.clear();
 
-        let text = null;
-        let usedPath = null;
-        for (const p of this._seedBigramsPaths) {
-            if (!p) continue;
-            try {
-                const file = Gio.File.new_for_path(p);
-                if (!file.query_exists(null)) continue;
-                const [ok, bytes] = file.load_contents(null);
-                if (!ok) continue;
-                const decoded = new TextDecoder('utf-8').decode(bytes);
-                if (!decoded.trim()) continue;
-                text = decoded;
-                usedPath = p;
-                break;
-            } catch (e) {
-                log(`gnome-osk: seed bigrams load failed at ${p}: ${e}`);
-            }
-        }
-
+        const [text, usedPath] =
+            this._loadFirstTextFile(this._seedBigramsPaths, 'seed bigrams');
         this._loadedSeedBigramsPath = usedPath;
         if (!text) {
+            if (removedFallbackWords) {
+                if (!this._loadedWordlistPath)
+                    this._topBaseCache = [];
+                this._rebuildPrefixIndex();
+            }
             log(`gnome-osk: no seed bigrams available ` +
                 `(tried: ${this._seedBigramsPaths.join(', ') || 'none'})`);
             return 0;
         }
 
         let loaded = 0;
+        const fallbackFreq = new Map();
         for (const raw of text.split(/\r?\n/)) {
             const line = raw.trim();
             if (!line || line.startsWith('#')) continue;
@@ -275,7 +268,26 @@ export class WordPredictor {
             // than overwriting -- safer default.
             const existing = m.get(next) || 0;
             m.set(next, Math.max(existing, c));
+            fallbackFreq.set(prev, (fallbackFreq.get(prev) || 0) + c);
+            fallbackFreq.set(next, (fallbackFreq.get(next) || 0) + c);
             loaded++;
+        }
+
+        let fallbackWords = 0;
+        for (const [word, score] of fallbackFreq) {
+            if (this._baseFreq.has(word)) continue;
+            this._baseFreq.set(word, score);
+            this._seedFallbackWords.add(word);
+            fallbackWords++;
+        }
+        if (fallbackWords > 0) {
+            if (!this._loadedWordlistPath) {
+                this._topBaseCache = [...fallbackFreq.entries()]
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 30)
+                    .map(([word]) => word);
+            }
+            this._rebuildPrefixIndex();
         }
 
         log(`gnome-osk: seed bigrams loaded (${loaded} pairs, ` +
@@ -600,11 +612,20 @@ export class WordPredictor {
     // ---- diagnostics -------------------------------------------------
 
     stats() {
+        const countPairs = map => {
+            let total = 0;
+            for (const nextMap of map.values())
+                total += nextMap.size;
+            return total;
+        };
         return {
             baseWords: this._baseFreq.size,
+            baseSourceEntries: this._baseSourceEntries,
             learnedWords: this._userBoost.size,
             bigramContexts: this._bigrams.size,
+            bigramPairs: countPairs(this._bigrams),
             seedBigramContexts: this._seedBigrams.size,
+            seedBigramPairs: countPairs(this._seedBigrams),
         };
     }
 

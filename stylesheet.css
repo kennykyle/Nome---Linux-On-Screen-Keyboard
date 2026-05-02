@@ -2,7 +2,7 @@
  *
  * The extension renders everything with inline styles computed from
  * the active theme + customisation record (see buildStyles() in
- * extension.js), so stylesheet rules below are deliberately minimal:
+ * theme.js), so stylesheet rules below are deliberately minimal:
  * they are only used as a fallback and for a few things that can't be
  * expressed with inline styles (e.g. the prompt dialog's class).
  *
@@ -138,4 +138,85 @@
  */
 .osk-prompt-dialog {
     max-width: 520px;
+}
+
+/* Customize window static chrome.  Dynamic theme/user-selected colors
+ * still stay inline in extension.js; fixed spacing, borders and text
+ * sizing live here to avoid repeated CSS string construction.
+ */
+.osk-customize-window {
+    background-color: #1e1e1e !important;
+    border: 2px solid #000000 !important;
+    border-radius: 10px !important;
+    padding: 0 !important;
+}
+
+.osk-customize-scroll {
+    padding: 4px 8px 10px 14px !important;
+}
+
+.osk-customize-body {
+    padding: 6px 8px 6px 0 !important;
+}
+
+.osk-customize-footer {
+    padding: 10px 14px 14px 14px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.osk-customize-titlebar {
+    background-color: #141414 !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 6px 12px !important;
+    min-height: 32px;
+}
+
+.osk-customize-title {
+    color: #eeeeee !important;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.osk-customize-title-hint {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-size: 11px;
+    padding: 0 10px !important;
+}
+
+.osk-customize-close {
+    color: #dddddd !important;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 32px;
+    min-height: 24px;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 0 10px !important;
+}
+
+.osk-customize-close:hover {
+    color: #ffffff !important;
+    background-color: #c42b1c !important;
+}
+
+.osk-customize-resize-grip {
+    color: rgba(255, 255, 255, 0.45) !important;
+    background-color: transparent !important;
+    border: none !important;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 26px;
+    min-height: 26px;
+    padding: 0 4px !important;
+}
+
+.osk-customize-resize-grip:hover {
+    color: #ffffff !important;
+}
+
+.osk-customize-theme-subtitle {
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-size: 11px;
+    padding-bottom: 4px !important;
 }

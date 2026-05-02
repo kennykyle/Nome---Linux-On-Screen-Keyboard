@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Nome - Error Logs
+GenericName=Error Logs
+Comment=Open a terminal with recent Nome OSK, GNOME Shell, recorder, and crash errors
+Exec=sh -c "script=\"${XDG_DATA_HOME:-$HOME/.local/share}/gnome-shell/extensions/gnome-osk@linuxosk.github.io/nome-osk-crash-logs.sh\"; exec \"$script\""
+Icon=utilities-terminal
+Terminal=true
+Categories=Utility;System;GNOME;GTK;
+Keywords=nome;osk;keyboard;crash;logs;journal;gnome-shell;mutter;screencast;
+StartupNotify=false

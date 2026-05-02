@@ -39,6 +39,7 @@ UUID="gnome-osk@linuxosk.github.io"
 EXT_DIR="$HOME/.local/share/gnome-shell/extensions/$UUID"
 DESKTOP_DIR="$HOME/.local/share/applications"
 DESKTOP_FILE="$DESKTOP_DIR/nome-onscreen-keyboard.desktop"
+LOGS_DESKTOP_FILE="$DESKTOP_DIR/nome-osk-crash-logs.desktop"
 LEGACY_DESKTOP_FILE="$DESKTOP_DIR/gnome-osk.desktop"
 # $XDG_DATA_HOME/gnome-osk/ is where the extension stores learned
 # words (userdata.json), UI prefs (config.json), wordlist.txt, and
@@ -97,9 +98,9 @@ if [[ -d "$EXT_DIR" ]]; then
 fi
 
 # ---- 3. Remove the app launcher ------------------------------------
-if [[ -f "$DESKTOP_FILE" || -f "$LEGACY_DESKTOP_FILE" ]]; then
+if [[ -f "$DESKTOP_FILE" || -f "$LOGS_DESKTOP_FILE" || -f "$LEGACY_DESKTOP_FILE" ]]; then
     info "Removing app-grid launcher"
-    rm -f "$DESKTOP_FILE" "$LEGACY_DESKTOP_FILE"
+    rm -f "$DESKTOP_FILE" "$LOGS_DESKTOP_FILE" "$LEGACY_DESKTOP_FILE"
     update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
     ok "Launcher deleted"
 fi
