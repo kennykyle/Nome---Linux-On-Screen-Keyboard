@@ -138,8 +138,6 @@ https://github.com/user-attachments/assets/cfc4983d-770d-40a8-8cd9-2ba4ead3ab57
 
 ### RGB Lighting
 
-https://github.com/user-attachments/assets/93f76df8-4dc4-4a06-83d3-882f5e5dd7f8
-
 https://github.com/user-attachments/assets/cb7775f3-d6f2-49b9-8d80-c76e85f1c8d0
 
 - RGB lighting can be turned off completely.
