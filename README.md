@@ -1,5 +1,7 @@
 # Nome - Onscreen Keyboard
 
+https://github.com/user-attachments/assets/9b4f16ad-1aff-4c84-a0c1-0ec29a566539
+
 Nome is a mouse-driven virtual on-screen keyboard for GNOME Shell 50 on Wayland. It runs inside GNOME Shell instead of as a normal app, which lets it stay above other windows, avoid stealing focus from the text field you are typing into, and send real keyboard events through Mutter's virtual input device. It is built for accessibility-first desktop use: mouse, touch, limited-movement workflows, terminals, login prompts, and any situation where GNOME's built-in keyboard is not enough.
 
 ## Why This Exists
@@ -8,7 +10,7 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 
 ## Very Simple Instructions
 
-1. Download the release zip.
+1. Download the release tar.
 2. Extract it.
 3. Make sure to right click the file > properties > check run as a program. Double-click `Install Nome - Onscreen Keyboard.sh`. 
 4. Follow the prompts.
@@ -17,15 +19,19 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 
 The easy installer keeps learned words and UI settings when reinstalling. It also asks whether you want GDM/login-screen support. That part is optional, requires administrator authentication, and can be skipped safely.
 
-If double-clicking is blocked, open a terminal in the extracted folder and run:
+If double-clicking is blocked, right click and pres run as program. Or open a terminal in the extracted folder and run:
 
 ```sh
 bash "./Install Nome - Onscreen Keyboard.sh"
 ```
 
+https://github.com/user-attachments/assets/cba254ab-5cf6-4575-ad80-5af878ecb89c
+
 ## Features
 
 ### Core Keyboard
+
+https://github.com/user-attachments/assets/c3870e71-adc1-4f18-a6d4-455cd7c6ba5c
 
 - Runs as a GNOME Shell extension, not a separate app window.
 - Stays above normal application windows.
@@ -51,6 +57,8 @@ bash "./Install Nome - Onscreen Keyboard.sh"
 
 ### Layouts
 
+<img width="348" height="688" alt="1t7Nx3x" src="https://github.com/user-attachments/assets/340f33cd-4ba6-4bfe-ad4e-59b8ba23997f" />
+
 - Windows OSK layout, used by default.
 - Full desktop layout with function keys.
 - Compact layout without the extra navigation column.
@@ -73,6 +81,8 @@ bash "./Install Nome - Onscreen Keyboard.sh"
 
 ### Word Prediction
 
+https://github.com/user-attachments/assets/df8d5670-eab9-47f2-9057-6c4b13ede832
+
 - Optional local word prediction.
 - Prediction is off by default.
 - No cloud service is required for prediction.
@@ -94,6 +104,8 @@ bash "./Install Nome - Onscreen Keyboard.sh"
 - Prediction is skipped in GDM and unlock-dialog modes for privacy and lighter login-screen behavior.
 
 ### Appearance And Customization - RICE UP!
+
+https://github.com/user-attachments/assets/cfc4983d-770d-40a8-8cd9-2ba4ead3ab57
 
 - Built-in themes: Dark, Light, Dracula, Nord, and Cyberpunk.
 - Custom themes can be created by editing a built-in theme.
@@ -125,6 +137,10 @@ bash "./Install Nome - Onscreen Keyboard.sh"
 - Settings are saved to local config and restored on the next session.
 
 ### RGB Lighting
+
+https://github.com/user-attachments/assets/93f76df8-4dc4-4a06-83d3-882f5e5dd7f8
+
+https://github.com/user-attachments/assets/cb7775f3-d6f2-49b9-8d80-c76e85f1c8d0
 
 - RGB lighting can be turned off completely.
 - Static RGB mode.
@@ -388,12 +404,9 @@ For JavaScript validation, run the extension under GNOME Shell or use a GJS-comp
 4. KDE Plasma support.
 5. Add debugging tool and log inspection.
 6. Improve Customization Window UI.
-7. New update notification. No auto update for security purposes.
+7. New update notification via github api. No auto update for security purposes.
+8. More languages.
 
 ## Contributing
 
 This project exists because accessibility matters. If Nome helps you, if it almost helps you, or if you know how to make it better, contributions are welcome. Good improvements include new layouts, safer installers, better prediction data handling, accessibility testing, bug fixes, GNOME version compatibility work, documentation, themes, and ideas from people who actually depend on tools like this every day.
-
-## License
-
-Add a license file before publishing if this repository is intended for public reuse.
