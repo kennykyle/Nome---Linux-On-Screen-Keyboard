@@ -1,0 +1,9 @@
+{
+  "uuid": "gnome-osk@linuxosk.github.io",
+  "name": "Nome - Onscreen Keyboard",
+  "description": "Mouse-driven virtual keyboard for GNOME 50 on Wayland. Runs inside GNOME Shell so it stays above normal app windows, doesn't steal keyboard focus when tapped, and works in every app including terminals.",
+  "shell-version": ["50"],
+  "session-modes": ["user", "unlock-dialog", "gdm"],
+  "url": "https://github.com/linuxosk/gnome-osk",
+  "version": 25
+}

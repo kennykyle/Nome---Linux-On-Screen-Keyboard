@@ -1,0 +1,222 @@
+/* Nome - Onscreen Keyboard stylesheet.
+ *
+ * The extension renders everything with inline styles computed from
+ * the active theme + customisation record (see buildStyles() in
+ * theme.js), so stylesheet rules below are deliberately minimal:
+ * they are only used as a fallback and for a few things that can't be
+ * expressed with inline styles (e.g. the prompt dialog's class).
+ *
+ * Plain class selectors with !important everywhere that matters.
+ * No type selectors (StBoxLayout, StButton) because Shell 50's CSS
+ * parser may not map those type names reliably.
+ */
+
+.osk-keyboard {
+    background-color: #1e1e1e !important;
+    border: 2px solid #000000 !important;
+    border-radius: 10px !important;
+    padding: 8px !important;
+}
+
+.osk-titlebar {
+    background-color: #141414 !important;
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+    min-height: 28px;
+}
+
+.osk-titlelabel {
+    color: #dddddd !important;
+    font-size: 13px;
+}
+
+.osk-titlebtn {
+    background-color: transparent !important;
+    color: #dddddd !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 32px;
+    min-height: 24px;
+    padding: 0 10px !important;
+}
+
+.osk-titlebtn:hover {
+    background-color: #333333 !important;
+}
+
+.osk-closebtn:hover {
+    background-color: #c42b1c !important;
+    color: #ffffff !important;
+}
+
+/* Key text color is NOT specified here.  OSKKey._applyTextColor pushes
+ * the per-state color directly onto Clutter.Text.color via set_color,
+ * which lets the cycling RGB marker handler override it without St
+ * re-propagating CSS color back over our explicit value on every
+ * paint (which it does for inline `color:` AND class-level `color:`
+ * with !important). */
+.osk-key {
+    background-color: #3c3c3c !important;
+    border: 1px solid #6a6a6a !important;
+    border-radius: 5px !important;
+    padding: 6px 4px !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.osk-key:hover {
+    background-color: #505050 !important;
+    border: 1px solid #888888 !important;
+}
+
+.osk-key:active {
+    background-color: #3584e4 !important;
+    border: 1px solid #1c71d8 !important;
+}
+
+.osk-key.mod-armed {
+    background-color: #3584e4 !important;
+    border: 1px solid #1c71d8 !important;
+}
+
+.osk-key.mod-locked {
+    background-color: #26a269 !important;
+    border: 1px solid #1c8654 !important;
+}
+
+.osk-grip {
+    background-color: transparent !important;
+    color: rgba(153, 153, 153, 0.72) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 24px;
+    min-height: 22px;
+    padding: 0 !important;
+}
+
+.osk-grip:hover {
+    background-color: rgba(255, 255, 255, 0.10) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.osk-prediction-bar {
+    background-color: #151515 !important;
+    border-radius: 6px !important;
+    padding: 3px !important;
+}
+
+.osk-prediction-btn {
+    background-color: #2a2a2a !important;
+    color: #eeeeee !important;
+    border: 1px solid #4a4a4a !important;
+    border-radius: 5px !important;
+    padding: 4px 8px !important;
+    font-size: 14px;
+}
+
+.osk-prediction-btn:hover {
+    background-color: #3a3a3a !important;
+    border: 1px solid #6a6a6a !important;
+}
+
+.osk-prediction-btn:active {
+    background-color: #1c71d8 !important;
+    color: #ffffff !important;
+    border: 1px solid #1a65c0 !important;
+}
+
+/* Customisation prompt dialog (Custom background path, RGB colour,
+ * keyboard background colour).  The dialog itself gets the default
+ * Shell ModalDialog look; this class is the root of the content box
+ * we add, and keeps its max-width in check so long paths don't make
+ * the dialog span the whole screen.
+ */
+.osk-prompt-dialog {
+    max-width: 520px;
+}
+
+/* Customize window static chrome.  Dynamic theme/user-selected colors
+ * still stay inline in extension.js; fixed spacing, borders and text
+ * sizing live here to avoid repeated CSS string construction.
+ */
+.osk-customize-window {
+    background-color: #1e1e1e !important;
+    border: 2px solid #000000 !important;
+    border-radius: 10px !important;
+    padding: 0 !important;
+}
+
+.osk-customize-scroll {
+    padding: 4px 8px 10px 14px !important;
+}
+
+.osk-customize-body {
+    padding: 6px 8px 6px 0 !important;
+}
+
+.osk-customize-footer {
+    padding: 10px 14px 14px 14px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.osk-customize-titlebar {
+    background-color: #141414 !important;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 6px 12px !important;
+    min-height: 32px;
+}
+
+.osk-customize-title {
+    color: #eeeeee !important;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.osk-customize-title-hint {
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-size: 11px;
+    padding: 0 10px !important;
+}
+
+.osk-customize-close {
+    color: #dddddd !important;
+    font-size: 18px;
+    font-weight: bold;
+    min-width: 32px;
+    min-height: 24px;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 0 10px !important;
+}
+
+.osk-customize-close:hover {
+    color: #ffffff !important;
+    background-color: #c42b1c !important;
+}
+
+.osk-customize-resize-grip {
+    color: rgba(255, 255, 255, 0.45) !important;
+    background-color: transparent !important;
+    border: none !important;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 26px;
+    min-height: 26px;
+    padding: 0 4px !important;
+}
+
+.osk-customize-resize-grip:hover {
+    color: #ffffff !important;
+}
+
+.osk-customize-theme-subtitle {
+    color: rgba(255, 255, 255, 0.55) !important;
+    font-size: 11px;
+    padding-bottom: 4px !important;
+}

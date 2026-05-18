@@ -313,11 +313,8 @@ export default class OSKExtension extends Extension {
             this._setVisible(this._config.showOnStartup !== false);
         }
 
-        // Loading the optional full wordlist is synchronous and can be
-        // large; keep it out of the launch path unless prediction was
-        // explicitly enabled in the saved config.
-        if (this._predictor && this._config.predictionEnabled)
-            this._schedulePredictorLoad(2500);
+        if (this._predictor)
+            this._schedulePredictorLoad();
 
         // Export a small D-Bus interface so the .desktop launcher
         // (and any external script) can ask the extension to show /
@@ -379,16 +376,15 @@ export default class OSKExtension extends Extension {
         return predictor;
     }
 
-    _schedulePredictorLoad(delayMs = 0) {
+    _schedulePredictorLoad() {
         if (!this._predictor || this._predictorLoadId) return;
-        const run = () => {
-            this._predictorLoadId = 0;
-            this._loadPredictorNow();
-            return GLib.SOURCE_REMOVE;
-        };
-        this._predictorLoadId = delayMs > 0
-            ? GLib.timeout_add(GLib.PRIORITY_LOW, delayMs, run)
-            : GLib.idle_add(GLib.PRIORITY_LOW, run);
+        this._predictorLoadId = GLib.idle_add(
+            GLib.PRIORITY_DEFAULT_IDLE,
+            () => {
+                this._predictorLoadId = 0;
+                this._loadPredictorNow();
+                return GLib.SOURCE_REMOVE;
+            });
     }
 
     _loadPredictorNow() {
@@ -512,8 +508,6 @@ export default class OSKExtension extends Extension {
             if (this._keyboard) this._keyboard.setPredictionEnabled(state);
             if (state && this._predictor && !this._predictorReady)
                 this._schedulePredictorLoad();
-            if (!state)
-                _clearSource(this, '_predictorLoadId');
             this._config = this._config || {};
             this._config.predictionEnabled = !!state;
             this._saveConfig();
@@ -4494,13 +4488,6 @@ export default class OSKExtension extends Extension {
     }
 
     _shouldProcessCapturedHoverMotion(x, y) {
-        if (!this._modalHoverTarget
-            || !this._actorContainsStagePoint(this._modalHoverTarget, x, y)) {
-            this._modalHoverLastUs = 0;
-            this._modalHoverLastX = null;
-            this._modalHoverLastY = null;
-            return true;
-        }
         const now = GLib.get_monotonic_time();
         const lastUs = this._modalHoverLastUs || 0;
         const lastX = this._modalHoverLastX;
@@ -4616,6 +4603,11 @@ export default class OSKExtension extends Extension {
         const type = event.type();
         if (!this._isPointerLikeEvent(type))
             return false;
+        if (!this._modalPointerTarget
+            && this._isPointerTrackingOnlyEvent(type)) {
+            this._clearCapturedHover();
+            return false;
+        }
         if (!this._shouldUseShellKeyboardEventBridge())
             return false;
 

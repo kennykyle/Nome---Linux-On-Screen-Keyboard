@@ -1,0 +1,22 @@
+[Desktop Entry]
+Type=Application
+Name=Nome - Onscreen Keyboard
+GenericName=Virtual Keyboard
+Comment=Mouse-driven virtual keyboard (GNOME Shell extension)
+# Two-step launch so the icon "just works" whether the extension is
+# loaded yet or not:
+#   1. gnome-extensions enable -- ensures the extension is in the
+#      enabled-extensions list.  No-op if already enabled.  On first
+#      install (Wayland) it takes effect on next login.
+#   2. gdbus call ... Toggle -- if the extension is loaded, this asks
+#      it to toggle the keyboard's visibility.  If the extension is
+#      NOT loaded yet (e.g. fresh install before logout/login), the
+#      gdbus call exits non-zero, but `||:` swallows that so the icon
+#      activation looks successful either way.
+Exec=sh -c "gnome-extensions enable gnome-osk@linuxosk.github.io 2>/dev/null; gdbus call --session --dest org.gnome.Shell --object-path /io/linuxosk/OSK --method io.linuxosk.OSK.Toggle 2>/dev/null ||:"
+Icon=input-keyboard
+Terminal=false
+Categories=Utility;Accessibility;GNOME;GTK;
+Keywords=keyboard;osk;virtual;accessibility;onscreen;touch;
+StartupNotify=false
+X-GNOME-UsesNotifications=false

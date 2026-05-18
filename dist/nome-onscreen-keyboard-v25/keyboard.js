@@ -622,9 +622,10 @@ const OSKTitleBar = GObject.registerClass({
         this._keyboard = keyboard;
         this.set_style(keyboard._styles.titleBar);
 
-        // Drag state owned by the title bar.  The whole top bar is a
-        // drag handle except for the min/close buttons, so users do not
-        // have to land exactly on the title text.
+        // Drag state owned by the title bar.  The draggable area is
+        // the label -- it's reactive, fills the space between left
+        // edge and the min/close buttons, and is NOT an St.Button,
+        // so its clicks don't collide with button handlers.
         this._dragStartX = null;
         this._dragStartY = null;
         this._dragOriginX = 0;
@@ -635,8 +636,6 @@ const OSKTitleBar = GObject.registerClass({
         this._dragApplyId = 0;
         this._dragPollId = 0;
         this._lifecycle = new OskLifecycleTracker(this);
-        this._stageSignals = new OskLifecycleTracker();
-        this._stageTrackingActive = false;
         this._sawButtonDown = false;
         this._pressTimeUs = 0;
         this._capturedHoverButton = null;
@@ -656,12 +655,8 @@ const OSKTitleBar = GObject.registerClass({
         label.connect('button-press-event', this._onDragStart.bind(this));
         label.connect('motion-event',       this._onDragMotion.bind(this));
         label.connect('button-release-event', this._onDragEnd.bind(this));
-        this.connect('button-press-event', this._onDragStart.bind(this));
-        this.connect('motion-event',       this._onDragMotion.bind(this));
-        this.connect('button-release-event', this._onDragEnd.bind(this));
         this.connect('destroy', () => {
             this._lifecycle.clearSource('_dragApplyId');
-            this._disconnectStageTracking();
             this._stopPointerPoll();
             if (this._dragGrab) {
                 try { this._dragGrab.dismiss(); } catch (_e) {}
@@ -820,8 +815,7 @@ const OSKTitleBar = GObject.registerClass({
 
         const overMin = this._actorContainsStagePoint(this._minBtn, x, y);
         const overClose = this._actorContainsStagePoint(this._closeBtn, x, y);
-        const overDrag = this._actorContainsStagePoint(this, x, y)
-            && !overMin && !overClose;
+        const overDrag = this._actorContainsStagePoint(this._dragLabel, x, y);
         this._setCapturedButtonHover(overMin ? 'min'
             : (overClose ? 'close' : null));
         const startsPointerSequence =
@@ -836,14 +830,14 @@ const OSKTitleBar = GObject.registerClass({
             this._capturedTitleButton = overMin ? 'min'
                 : (overClose ? 'close' : null);
             if (this._capturedTitleButton) return Clutter.EVENT_STOP;
-            if (overDrag) return this._onDragStart(this, event);
+            if (overDrag) return this._onDragStart(this._dragLabel, event);
             return Clutter.EVENT_PROPAGATE;
         }
 
         if (type === Clutter.EventType.MOTION
             || type === Clutter.EventType.TOUCH_UPDATE) {
             if (this._dragStartX !== null)
-                return this._onDragMotion(this, event);
+                return this._onDragMotion(this._dragLabel, event);
             return Clutter.EVENT_STOP;
         }
 
@@ -851,7 +845,7 @@ const OSKTitleBar = GObject.registerClass({
             const pressed = this._capturedTitleButton;
             this._capturedTitleButton = null;
             if (this._dragStartX !== null)
-                return this._onDragEnd(this, event);
+                return this._onDragEnd(this._dragLabel, event);
             if (type !== Clutter.EventType.TOUCH_CANCEL) {
                 if (pressed === 'min' && overMin)
                     this.emit('minimize-requested');
@@ -883,22 +877,12 @@ const OSKTitleBar = GObject.registerClass({
     }
 
     _onDragStart(_actor, event) {
-        if (this._dragStartX !== null) return Clutter.EVENT_STOP;
         if (this._dragLocked) return Clutter.EVENT_PROPAGATE;
-        const type = event.type ? event.type() : null;
-        if (type === Clutter.EventType.BUTTON_PRESS
-            && event.get_button && event.get_button() !== 1)
+        if (event.get_button && event.get_button() !== 1)
             return Clutter.EVENT_PROPAGATE;
         const kbd = this.get_parent();
         if (!kbd) return Clutter.EVENT_PROPAGATE;
-        let x, y;
-        try {
-            [x, y] = event.get_coords();
-        } catch (_e) {
-            return Clutter.EVENT_PROPAGATE;
-        }
-        if (this._pointOverTitleButton(x, y))
-            return Clutter.EVENT_PROPAGATE;
+        const [x, y] = event.get_coords();
         this._dragStartX = x;
         this._dragStartY = y;
         this._dragOriginX = kbd.get_x();
@@ -909,39 +893,22 @@ const OSKTitleBar = GObject.registerClass({
             this._keyboard._beginInteractiveMotion('drag');
         try {
             if (global.stage.grab) {
-                this._dragGrab = global.stage.grab(this);
+                this._dragGrab = global.stage.grab(this._dragLabel);
             }
         } catch (_e) {
             this._dragGrab = null;
         }
-        this._connectStageTracking();
         this._startPointerPoll();
         return Clutter.EVENT_STOP;
     }
 
     _onDragMotion(_actor, event) {
         if (this._dragStartX === null) return Clutter.EVENT_PROPAGATE;
-        let x, y;
-        try {
-            [x, y] = event.get_coords();
-        } catch (_e) {
-            return Clutter.EVENT_PROPAGATE;
-        }
-        this._updatePendingDragPosition(x, y);
-        this._queuePendingDragApply();
-        return Clutter.EVENT_STOP;
-    }
-
-    _updatePendingDragPosition(x, y) {
-        if (this._dragStartX === null) return;
+        const [x, y] = event.get_coords();
         this._pendingDragX = Math.round(
             this._dragOriginX + (x - this._dragStartX));
         this._pendingDragY = Math.round(
             this._dragOriginY + (y - this._dragStartY));
-    }
-
-    _queuePendingDragApply() {
-        if (this._dragStartX === null) return;
         if (!this._dragApplyId) {
             this._lifecycle.timeoutAdd(
                 '_dragApplyId',
@@ -951,6 +918,7 @@ const OSKTitleBar = GObject.registerClass({
                     return GLib.SOURCE_REMOVE;
                 });
         }
+        return Clutter.EVENT_STOP;
     }
 
     _applyPendingDragPosition() {
@@ -960,11 +928,9 @@ const OSKTitleBar = GObject.registerClass({
     }
 
     _onDragEnd() {
-        if (this._dragStartX === null) return Clutter.EVENT_PROPAGATE;
         this._lifecycle.clearSource('_dragApplyId');
-        this._disconnectStageTracking();
         this._stopPointerPoll();
-        this._applyPendingDragPosition();
+        if (this._dragStartX !== null) this._applyPendingDragPosition();
         this._dragStartX = null;
         this._dragStartY = null;
         if (this._dragGrab) {
@@ -974,47 +940,6 @@ const OSKTitleBar = GObject.registerClass({
         if (this._keyboard && this._keyboard._endInteractiveMotion)
             this._keyboard._endInteractiveMotion('drag');
         return Clutter.EVENT_STOP;
-    }
-
-    _connectStageTracking() {
-        if (this._stageTrackingActive) return;
-        this._connectStageSignal('captured-event',
-            (_stage, event) => this._onStageCapturedEvent(event));
-        this._connectStageSignal('button-release-event',
-            (_stage, event) => this._onStageCapturedEvent(event));
-        this._connectStageSignal('touch-event',
-            (_stage, event) => this._onStageCapturedEvent(event));
-        this._stageTrackingActive = true;
-    }
-
-    _connectStageSignal(name, callback) {
-        try {
-            this._stageSignals.connect(global.stage, name, callback);
-        } catch (_e) {}
-    }
-
-    _disconnectStageTracking() {
-        if (this._stageSignals)
-            this._stageSignals.clear();
-        this._stageTrackingActive = false;
-    }
-
-    _onStageCapturedEvent(event) {
-        if (this._dragStartX === null) return Clutter.EVENT_PROPAGATE;
-        const type = event.type();
-        if (type === Clutter.EventType.MOTION
-            || type === Clutter.EventType.TOUCH_UPDATE) {
-            this._onDragMotion(this, event);
-            return Clutter.EVENT_STOP;
-        }
-        if (type === Clutter.EventType.BUTTON_RELEASE
-            || type === Clutter.EventType.TOUCH_END
-            || type === Clutter.EventType.TOUCH_CANCEL) {
-            this._onDragMotion(this, event);
-            this._onDragEnd();
-            return Clutter.EVENT_STOP;
-        }
-        return Clutter.EVENT_PROPAGATE;
     }
 
     _readPointer() {
@@ -1041,9 +966,8 @@ const OSKTitleBar = GObject.registerClass({
                 const p = this._readPointer();
                 if (p) {
                     const mask = Clutter.ModifierType.BUTTON1_MASK || 0;
-                    let isDown = true;
                     if (mask) {
-                        isDown = !!((p[2] || 0) & mask);
+                        const isDown = !!((p[2] || 0) & mask);
                         if (isDown) this._sawButtonDown = true;
                         const elapsedMs = (GLib.get_monotonic_time()
                             - this._pressTimeUs) / 1000;
@@ -1053,10 +977,6 @@ const OSKTitleBar = GObject.registerClass({
                             this._onDragEnd();
                             return GLib.SOURCE_REMOVE;
                         }
-                    }
-                    if (!mask || isDown || !this._sawButtonDown) {
-                        this._updatePendingDragPosition(p[0], p[1]);
-                        this._applyPendingDragPosition();
                     }
                 }
                 return GLib.SOURCE_CONTINUE;
@@ -1068,11 +988,6 @@ const OSKTitleBar = GObject.registerClass({
             this._lifecycle.clearSource('_dragPollId');
         else
             _clearSource(this, '_dragPollId');
-    }
-
-    _pointOverTitleButton(x, y) {
-        return this._actorContainsStagePoint(this._minBtn, x, y)
-            || this._actorContainsStagePoint(this._closeBtn, x, y);
     }
 });
 
