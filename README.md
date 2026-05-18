@@ -1,29 +1,42 @@
 # Nome - Onscreen Keyboard
 
-Nome is a mouse-driven on-screen keyboard for GNOME Shell 50 on Wayland. It runs inside GNOME Shell instead of as a normal app, which lets it stay above normal app windows, avoid stealing focus from the text field you are typing into, and send real keyboard events through Mutter's virtual input device. It is built for accessibility-first desktop use: mouse, touch, limited-movement workflows, terminals, login prompts, and any situation where GNOME's built-in keyboard is not enough.
+https://github.com/user-attachments/assets/9b4f16ad-1aff-4c84-a0c1-0ec29a566539
+
+Nome is a mouse-driven virtual on-screen keyboard for GNOME Shell 50 on Wayland. It runs inside GNOME Shell instead of as a normal app, which lets it stay above other windows, avoid stealing focus from the text field you are typing into, and send real keyboard events through Mutter's virtual input device. It is built for accessibility-first desktop use: mouse, touch, limited-movement workflows, terminals, login prompts, and any situation where GNOME's built-in keyboard is not enough.
 
 ## Why This Exists
 
-I have SMA type 2. I always wanted to move to Linux, but accessibility was pretty poor for me on every distro I tried. Now I am finally able to use Linux thanks to AI and its power to help with coding. For some people this might be called "AI slop", but for me, and hopefully for others, it is freedom and the ability to use one of the best operating systems out there. I did my best with what I know and have, and this software is working perfectly for my needs. Nome is made from my imagination, shaped around what I personally need, and shared so others can expand it, help improve it, and see how far we can push accessibility on Linux together.
+I have SMA type 2. I always wanted to move to Linux, but accessibility was pretty poor for me on every distro I tried. Now I am finally able to use Linux thanks to AI and its power to help with coding. For some people this might be called "AI slop", but for me, and hopefully for others, it is freedom and the ability to use one of the best operating systems out there. I did my best with what I know and have, and this software is working perfectly for my needs. Nome is made from my imagination, shaped around what I personally need, and shared so others can expand it, help improve it, and see how far we can push accessibility on Linux together. This is only one accessibility tool out of many that i want to make. More are coming. Thank you!
 
 ## Very Simple Instructions
 
-1. Download the release zip.
+1. Download the release tar.
 2. Extract it.
-3. Double-click `Install Nome - Onscreen Keyboard.sh`.
+3. Make sure to right click the file > properties > check run as a program. Double-click `Install Nome - Onscreen Keyboard.sh`. 
 4. Follow the prompts.
 5. Log out and log back in.
-6. Click the keyboard icon in the GNOME top bar.
+6. Click the keyboard icon in your app menu.
+
+The easy installer keeps learned words and UI settings when reinstalling. It also asks whether you want GDM/login-screen support. That part is optional, requires administrator authentication, and can be skipped safely.
+
+If double-clicking is blocked, right click and pres run as program. Or open a terminal in the extracted folder and run:
+
+```sh
+bash "./Install Nome - Onscreen Keyboard.sh"
+```
+
+https://github.com/user-attachments/assets/cba254ab-5cf6-4575-ad80-5af878ecb89c
 
 ## Features
 
 ### Core Keyboard
 
+https://github.com/user-attachments/assets/c3870e71-adc1-4f18-a6d4-455cd7c6ba5c
+
 - Runs as a GNOME Shell extension, not a separate app window.
 - Stays above normal application windows.
-- Uses GNOME Shell chrome so it can remain available where normal Wayland apps cannot.
-- Keeps the OSK clickable above Shell popups in normal desktop sessions without replaying captured events.
-- Keeps stronger modal handling for login/unlock surfaces.
+- Uses GNOME Shell chrome/top-chrome layers so it can remain available where normal Wayland apps cannot.
+- Includes modal-aware input handling so it can stay usable around Shell authentication prompts and modal dialogs.
 - Does not steal focus when you click a key.
 - Sends real key events through Mutter's virtual keyboard device.
 - Works with normal apps and terminals.
@@ -41,10 +54,10 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - Left-click the panel icon to show or hide the keyboard.
 - Right-click the panel icon to open the options menu.
 - Optional hover-to-open panel menu for users who find right-clicking difficult.
-- App-grid launcher through `nome-onscreen-keyboard.desktop`.
-- D-Bus control interface with `Show`, `Hide`, and `Toggle` methods.
 
 ### Layouts
+
+<img width="348" height="688" alt="1t7Nx3x" src="https://github.com/user-attachments/assets/340f33cd-4ba6-4bfe-ad4e-59b8ba23997f" />
 
 - Windows OSK layout, used by default.
 - Full desktop layout with function keys.
@@ -52,10 +65,6 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - Laptop layout with function keys in a narrower arrangement.
 - Mobile / Touch layout for smaller, touch-first use.
 - Layout choice is saved across sessions.
-- Layout switching resizes the keyboard to useful defaults.
-- Keys scale with the keyboard size.
-- Supports common desktop keys including letters, numbers, punctuation, Backspace, Tab, Enter, Esc, arrows, Home, End, Page Up, Page Down, Insert, Delete, Print Screen, Scroll Lock, Pause, Menu, Ctrl, Alt, Shift, and Super/Meta.
-- Windows OSK-style side keys for Options, Help, Fade, Dock, Move Up, and Move Down.
 
 ### Typing Behavior
 
@@ -64,13 +73,15 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - Armed modifiers are consumed after the next keypress.
 - Locked modifiers stay active until turned off.
 - Left-clicking a modifier can send the modifier key itself.
-- Supports chords such as Ctrl+Alt+T or Ctrl+Shift combinations.
+- Supports chords such as Ctrl+Alt+T, Ctrl+Shift etc combinations.
 - Shifted key labels update when Shift is active.
 - Hold-to-repeat support.
 - Key repeat modes: Off, Slow, Normal, and Fast.
 - Fade button cycles keyboard opacity.
 
 ### Word Prediction
+
+https://github.com/user-attachments/assets/df8d5670-eab9-47f2-9057-6c4b13ede832
 
 - Optional local word prediction.
 - Prediction is off by default.
@@ -92,7 +103,9 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - Menu item to clear learned words without removing the base dictionary.
 - Prediction is skipped in GDM and unlock-dialog modes for privacy and lighter login-screen behavior.
 
-### Appearance And Customization
+### Appearance And Customization - RICE UP!
+
+https://github.com/user-attachments/assets/cfc4983d-770d-40a8-8cd9-2ba4ead3ab57
 
 - Built-in themes: Dark, Light, Dracula, Nord, and Cyberpunk.
 - Custom themes can be created by editing a built-in theme.
@@ -125,6 +138,10 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 
 ### RGB Lighting
 
+https://github.com/user-attachments/assets/93f76df8-4dc4-4a06-83d3-882f5e5dd7f8
+
+https://github.com/user-attachments/assets/cb7775f3-d6f2-49b9-8d80-c76e85f1c8d0
+
 - RGB lighting can be turned off completely.
 - Static RGB mode.
 - Gradient RGB mode.
@@ -150,8 +167,7 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - Auto-shows in GDM and unlock-dialog modes.
 - Skips the panel indicator in authentication modes where the top bar is not the right interaction surface.
 - Installer can copy the extension to the system GNOME Shell extension path for GDM.
-- Installer can update and lock GDM dconf extension settings so stale greeter settings cannot hide the keyboard.
-- Login-screen mode skips word prediction and RGB effects, while throttling hover bridge work for lower greeter latency.
+- Installer can update GDM dconf settings.
 - GDM restore command removes login-screen integration.
 - Normal user install and GDM install are separate so users can skip system-level changes.
 - Installer does not restart GDM automatically because that would end graphical sessions.
@@ -166,9 +182,8 @@ I have SMA type 2. I always wanted to move to Linux, but accessibility was prett
 - `--keep-data` option preserves learned words and UI settings.
 - Optional GDM prompt during install.
 - Environment diagnostic command with `./install.sh check`.
-- App-grid error-log launcher that opens a terminal and saves a focused Nome/GNOME Shell snapshot, with `--verbose` available for broader portal/Mutter/session noise when needed.
-- Installer downloads the full English wordlist by default.
-- Installer downloads and sorts seed bigrams by default.
+- Installer can fetch English wordlist data.
+- Installer can fetch and sort seed bigrams.
 - Falls back to bundled seed bigrams if downloads fail.
 - Creates an app-grid launcher.
 - Enables the extension through `gnome-extensions`.
@@ -190,7 +205,7 @@ The extension declares `"shell-version": ["50"]` in `metadata.json`. Other GNOME
 
 ### Recommended
 
-- `curl` or `wget` for downloading prediction data during install.
+- `curl` or `wget` for downloading prediction data.
 - `gsettings` for extension enable/disable cleanup.
 - `update-desktop-database` for refreshing the app launcher database.
 - Log out and log back in after install or update.
@@ -203,29 +218,6 @@ The extension declares `"shell-version": ["50"]` in `metadata.json`. Other GNOME
 - `zenity` or `kdialog` as file picker fallbacks.
 - `gnome-session-quit` or `loginctl` for the installer's optional logout prompt.
 - `zip` if you want to build a release archive with `make-release.sh`.
-
-## Easy Install From A Release Zip
-
-1. Download the release zip from GitHub Releases.
-2. Extract the zip.
-3. Double-click:
-
-```text
-Install Nome - Onscreen Keyboard.sh
-```
-
-4. If your file manager asks, choose "Allow Launching", "Trust and Launch", or "Run".
-5. Follow the prompts.
-6. Log out and log back in when the installer finishes.
-7. Click the keyboard icon in the GNOME top bar to show or hide Nome.
-
-The easy installer keeps learned words and UI settings when reinstalling. It also asks whether you want GDM/login-screen support. That part is optional, requires administrator authentication, and can be skipped safely.
-
-If double-clicking is blocked, open a terminal in the extracted folder and run:
-
-```sh
-bash "./Install Nome - Onscreen Keyboard.sh"
-```
 
 ## Manual Install
 
@@ -253,12 +245,6 @@ To install and also ask about GDM/login-screen support:
 
 ```sh
 ./install.sh --keep-data --ask-gdm
-```
-
-To recover or update only the normal desktop extension without touching GDM/login-screen support:
-
-```sh
-./install.sh --keep-data --no-gdm
 ```
 
 To run diagnostics:
@@ -299,8 +285,6 @@ To install GDM support:
 sudo ./install.sh gdm-install
 ```
 
-`gdm-install` repairs `/etc/dconf/profile/gdm` so the profile starts with `user-db:user`, reads `system-db:gdm`, and keeps the distro greeter defaults database when it exists. It also makes the GDM service export `DCONF_PROFILE=gdm`, writes a high-priority GDM-only `org.gnome.shell` override, quarantines stale Nome dconf backups outside the active database path, and adds a GNOME Shell schema fallback for dynamic greeter users so the UUID, an empty `disabled-extensions` string array, and `disable-user-extensions=false` are visible before the greeter shell starts.
-
 To remove GDM support:
 
 ```sh
@@ -313,19 +297,6 @@ Reboot to see the keyboard on the login screen. You can also restart GDM, but th
 sudo systemctl restart gdm
 ```
 
-If the login keyboard still does not appear after a reboot or GDM restart, run:
-
-```sh
-sudo ./install.sh check
-sudo journalctl -b _COMM=gnome-shell --no-pager | grep gnome-osk
-```
-
-If the journal shows the `/usr/share/gnome-shell/extensions` copy being
-scanned but has no `session-mode=gdm` enable line, GDM can see the system
-extension but is not activating it. In that case, the useful output is the
-full `sudo ./install.sh check` report, especially the `DCONF_PROFILE=gdm`
-enabled/disabled extension values.
-
 ## Updating
 
 Updating is the same as installing again.
@@ -336,7 +307,7 @@ For most users:
 ./install.sh --keep-data
 ```
 
-If you previously installed GDM/login-screen support, the installer detects and updates that copy automatically. To install or repair it manually:
+If you previously installed GDM/login-screen support, update that copy too:
 
 ```sh
 sudo ./install.sh gdm-install
@@ -380,17 +351,12 @@ Prediction is local. User data is stored under:
 ${XDG_DATA_HOME:-~/.local/share}/gnome-osk/
 ```
 
-The installer downloads prediction data by default, and the extension
-menu can re-download it later:
+The installer and extension menu can download:
 
-- The full frequency-sorted English word list from `hermitdave/FrequencyWords`.
+- A frequency-sorted English word list from `hermitdave/FrequencyWords`.
 - Seed bigrams from Peter Norvig's `count_2w.txt`.
 
-If downloads fail, the keyboard still works. Prediction can still use
-the bundled seed fallback and learn from typed words, and prediction
-data can be downloaded later from the panel menu. Use
-`./install.sh --no-download-prediction-data` for intentionally offline
-installs.
+If downloads fail, the keyboard still works. Prediction can still learn from typed words, and prediction data can be downloaded later from the panel menu.
 
 ## Repository Layout
 
@@ -406,8 +372,6 @@ Uninstall Nome - Onscreen Keyboard.sh Easy double-click uninstaller
 README-FIRST.txt                     Short instructions for release zip users
 make-release.sh                      Builds the GitHub release archive under dist/
 nome-onscreen-keyboard.desktop       App-grid launcher
-nome-osk-crash-logs.sh               Terminal error/crash log collector
-nome-osk-crash-logs.desktop          App-grid launcher for error logs
 seed-bigrams.txt                     Bundled fallback bigram list
 ```
 
@@ -425,7 +389,6 @@ Useful checks before publishing:
 ./install.sh check
 bash -n install.sh
 bash -n uninstall.sh
-bash -n nome-osk-crash-logs.sh
 bash -n "./Install Nome - Onscreen Keyboard.sh"
 bash -n "./Uninstall Nome - Onscreen Keyboard.sh"
 bash -n make-release.sh
@@ -439,13 +402,11 @@ For JavaScript validation, run the extension under GNOME Shell or use a GJS-comp
 2. Macros.
 3. Custom fonts.
 4. KDE Plasma support.
-5. Improve Customization Window UI.
-6. New update notification. No auto update for security purposes.
+5. Add debugging tool and log inspection.
+6. Improve Customization Window UI.
+7. New update notification via github api. No auto update for security purposes.
+8. More languages.
 
 ## Contributing
 
 This project exists because accessibility matters. If Nome helps you, if it almost helps you, or if you know how to make it better, contributions are welcome. Good improvements include new layouts, safer installers, better prediction data handling, accessibility testing, bug fixes, GNOME version compatibility work, documentation, themes, and ideas from people who actually depend on tools like this every day.
-
-## License
-
-Add a license file before publishing if this repository is intended for public reuse.
